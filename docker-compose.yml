@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:services:
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: Model_Logger
+    ports:
+      - "3307:3306"
+
+  app:
+    build: .
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db  # Flask app can connect to MySQL at the hostname 'db'
+    volumes:
+      - .:/app
